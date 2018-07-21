@@ -1,4 +1,4 @@
-// Copyright 2013 The Rust Project Developers. See the COPYRIGHT
+// Copyright 2017 The Rust Project Developers. See the COPYRIGHT
 // file at the top-level directory of this distribution and at
 // http://rust-lang.org/COPYRIGHT.
 //
@@ -8,12 +8,6 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-// check-stdout
-// error-pattern:thread 'test_panic::test_foo' panicked at
-// compile-flags: --test
-// ignore-emscripten
+#![test_runner(main)] //~ ERROR Custom Test Frameworks is an unstable feature
 
-#[test]
-fn test_foo() {
-    panic!()
-}
+fn main() {}

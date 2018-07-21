@@ -9,7 +9,7 @@
 // except according to those terms.
 
 // check-stdout
-// error-pattern:thread 'test_foo' panicked at
+// error-pattern:thread 'test_should_fail_bad_message::test_foo' panicked at
 // compile-flags: --test
 // ignore-emscripten
 
