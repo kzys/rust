@@ -40,6 +40,7 @@
 #![feature(panic_unwind)]
 #![feature(staged_api)]
 #![feature(termination_trait_lib)]
+#![feature(test)]
 
 extern crate getopts;
 #[cfg(any(unix, target_os = "cloudabi"))]

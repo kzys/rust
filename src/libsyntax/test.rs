@@ -328,23 +328,6 @@ enum BadTestSignature {
     ShouldPanicOnlyWithNoArgs,
 }
 
-/// Will create a use or extern statement to expose the functions
-/// contained in the test crate. This function works even when
-/// compiling libtest.
-fn mk_use_test(cx: &TestCtxt) -> P<ast::Item> {
-    let id_test = Ident::from_str("test");
-    let sp = ignored_span(cx, DUMMY_SP);
-    let ecx = &cx.ext_cx;
-
-    if cx.is_libtest {
-        ecx.item_use_simple(sp,
-            respan(sp, ast::VisibilityKind::Public),
-            ecx.path(sp, vec![id_test]))
-    } else {
-        ecx.item_extern_crate(sp, id_test)
-    }
-}
-
 /// Creates a function item for use as the main function of a test build.
 /// This function will call the `test_runner` as specified by the crate attribute
 fn mk_main(cx: &mut TestCtxt) -> P<ast::Item> {
@@ -355,11 +338,12 @@ fn mk_main(cx: &mut TestCtxt) -> P<ast::Item> {
     //        }
     let sp = ignored_span(cx, DUMMY_SP);
     let ecx = &cx.ext_cx;
+    let test_id = ecx.ident_of("test").gensym();
 
     // test::test_main_static(...)
     let mut test_runner = cx.test_runner.clone().unwrap_or(
         ecx.path(sp, vec![
-            ecx.ident_of("test"), ecx.ident_of("test_main_static")
+            test_id, ecx.ident_of("test_main_static")
         ]));
 
     test_runner.span = sp;
@@ -373,12 +357,16 @@ fn mk_main(cx: &mut TestCtxt) -> P<ast::Item> {
     let main_meta = ecx.meta_word(sp, Symbol::intern("main"));
     let main_attr = ecx.attribute(sp, main_meta);
 
-    // extern test
-    let use_test = ecx.stmt_item(sp, mk_use_test(cx));
+    // extern crate test as test_gensym
+    let test_extern_stmt = ecx.stmt_item(sp, ecx.item(sp,
+        test_id,
+        vec![],
+        ast::ItemKind::ExternCrate(Some(Symbol::intern("test")))
+    ));
 
     // pub fn main() { ... }
     let main_ret_ty = ecx.ty(sp, ast::TyKind::Tup(vec![]));
-    let main_body = ecx.block(sp, vec![use_test, call_test_main]);
+    let main_body = ecx.block(sp, vec![test_extern_stmt, call_test_main]);
     let main = ast::ItemKind::Fn(ecx.fn_decl(vec![], ast::FunctionRetTy::Ty(main_ret_ty)),
                            ast::FnHeader::default(),
                            ast::Generics::default(),
