@@ -40,6 +40,7 @@
 #![feature(panic_unwind)]
 #![feature(staged_api)]
 #![feature(termination_trait_lib)]
+#![feature(test)]
 
 extern crate getopts;
 #[cfg(any(unix, target_os = "cloudabi"))]
@@ -301,7 +302,7 @@ pub fn test_main(args: &[String], tests: Vec<TestDescAndFn>, options: Options) {
 // a Vec<TestDescAndFn> is used in order to effect ownership-transfer
 // semantics into parallel test runners, which in turn requires a Vec<>
 // rather than a &[].
-pub fn test_main_static(tests: &[TestDescAndFn]) {
+pub fn test_main_static(tests: &[&mut TestDescAndFn]) {
     let args = env::args().collect::<Vec<_>>();
     let owned_tests = tests
         .iter()
