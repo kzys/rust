@@ -121,7 +121,7 @@ impl<'a> fold::Folder for TestHarnessGenerator<'a> {
 
         let mut item = i.into_inner();
         if is_test_case(&item) {
-            debug!("this is a test function");
+            debug!("this is a test item");
 
             let test = Test {
                 span: item.span,
@@ -129,9 +129,6 @@ impl<'a> fold::Folder for TestHarnessGenerator<'a> {
             };
             self.cx.test_cases.push(test);
             self.tests.push(item.ident);
-
-            // Ensure this item is capable of being reexported
-            item.vis = respan(item.vis.span, ast::VisibilityKind::Public);
         }
 
         // We don't want to recurse into anything other than mods, since

@@ -475,7 +475,7 @@ impl<'a, 'cl> Resolver<'a, 'cl> {
             return def;
         }
 
-        if *&path[0].as_str() == "test" {
+        if kind == MacroKind::Attr && *&path[0].as_str() == "test" {
             return Ok(self.macro_prelude.get(&path[0].name).unwrap().def())
         }
 
